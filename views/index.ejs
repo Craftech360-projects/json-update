@@ -28,14 +28,31 @@
           <option value="puzzle_solver">Super-duper puzzle solver</option>
           <option value="story_teller">Amazing story teller</option>
           <option value="joke_teller">Hilarious joke teller</option>
+          <option value="custom">Custom prompt</option>
         </select>
       </div>
 
+      <div class="form-group" id="custom-prompt-group" style="display: none;">
+        <label for="custom_prompt">Your Custom Role:</label>
+        <input type="text" id="custom_prompt" name="custom_prompt" placeholder="Enter the role (e.g. magical wizard)">
+        
+        <label for="custom_action">What can you help with?:</label>
+        <textarea id="custom_action" name="custom_action" rows="4" placeholder="Enter what you can help with"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Default Language: English</label>
+      </div>
+
+   
+    
       <div class="form-group">
         <label for="language">Select Language:</label>
-        <select id="language" name="language" required>
-          <option value="english">English</option>
+        <select id="language" name="language">
           <option value="hindi">Hindi</option>
+          <option value="tamil">Tamil</option>
+          <option value="malayalam">Malayalam</option>
+          <option value="bhojpuri">Bhojpuri</option>
+          <option value="punjabi">Punjabi</option>
         </select>
       </div>
       
@@ -46,5 +63,15 @@
       <p>Your inputs will be saved to a JSON file.</p>
     </div>
   </div>
+  <script>
+    document.getElementById('prompt_selection').addEventListener('change', function() {
+        const customPromptGroup = document.getElementById('custom-prompt-group');
+        if (this.value === 'custom') {
+            customPromptGroup.style.display = 'block';
+        } else {
+            customPromptGroup.style.display = 'none';
+        }
+    });
+    </script>
 </body>
 </html>

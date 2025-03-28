@@ -21,9 +21,9 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Ensure inputs.json exists
-const inputsFile = path.join(dataDir, 'inputs.json');
-if (!fs.existsSync(inputsFile)) {
-  fs.writeFileSync(inputsFile, JSON.stringify([], null, 2));
+const newInputsFile = path.join(dataDir, 'new_inputs.json');
+if (!fs.existsSync(newInputsFile)) {
+  fs.writeFileSync(newInputsFile, JSON.stringify({}, null, 2));
 }
 
 // Routes
@@ -33,89 +33,85 @@ app.get('/', (req, res) => {
 
 app.post('/submit', (req, res) => {
   try {
-    const { name, prompt_selection, language } = req.body;
+    const { name, prompt_selection, language, custom_prompt, custom_action } = req.body;
 
-    // Construct the start_text based on the name and language
+    // Construct the start_text based on the name
     const start_text = `Hiya, little buddy! I’m ${name}, the `;
 
-    // Determine the prompt based on the selection
+    // Determine the prompt text
     let promptText = "";
-    let mainPromptOptions = [];
     switch (prompt_selection) {
       case "puzzle_solver":
         promptText = "super-duper puzzle solver!";
-        mainPromptOptions = [
-          "Solve a tricky puzzle",
-          "Find a happy way to fix things",
-          "Help my friends"
-        ];
         break;
       case "story_teller":
         promptText = "amazing story teller!";
-        mainPromptOptions = [
-          "Tell a story about animals",
-          "Tell a story about space",
-          "Tell a story about friendship"
-        ];
         break;
       case "joke_teller":
         promptText = "hilarious joke teller!";
-        mainPromptOptions = [
-          "Tell a joke about cats",
-          "Tell a joke about dogs",
-          "Tell a joke about school"
-        ];
         break;
-      default:
-        promptText = "unknown!";
-        mainPromptOptions = [];
+        case "custom":
+          promptText = custom_prompt || "custom prompt writer!";
+          break;
+        default:
+          promptText = "unknown!";
     }
 
-    const languageText = language === "hindi" ? " in Hindi." : ".";
     let fullStartText = "";
-    
     switch (prompt_selection) {
       case "puzzle_solver":
-        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to fix puzzle solver things${languageText}`;
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to fix puzzle solver things.`;
         break;
       case "story_teller":
-        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell stories${languageText}`;
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell stories.`;
         break;
       case "joke_teller":
-        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell jokes${languageText}`;
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell jokes.`;
         break;
-      default:
-        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to help${languageText}`;
-        break;
+        case "custom":
+          fullStartText = `Hiya, little buddy! I'm ${name}, the ${custom_prompt}! I love helping my friends and finding happy ways to ${custom_action}`;
+          break;
+        default:
+          fullStartText = `Hiya, little buddy! I'm ${name}, the ${promptText}! I love helping my friends and finding happy ways to help.`;
+          break;
     }
 
-    // Define the single new JSON file
-    const newInputsFile = path.join(dataDir, "new_inputs.json");
+    const languageText = language ? ` in ${language}.` : ".";
+    const fullPrompt = prompt_selection === 'custom' 
+      ? `You are ${name}, a ${custom_prompt}. You help children by ${custom_action}${languageText}`
+      : `You are ${name}, a kind and clever toy. A child asks you a ${promptText} questions or request${languageText} Reply in respective language with a fun and engaging.`;
+    
+    const mainPromptOptions = [fullPrompt];
 
-    // Check if the file exists
-    if (!fs.existsSync(newInputsFile)) {
-      // If the file doesn't exist, create it with an empty object
-      fs.writeFileSync(newInputsFile, JSON.stringify({}, null, 2));
-    }
 
-    let rawData = "{}";
-    try {
-        rawData = fs.readFileSync(newInputsFile);
-    } catch (error) {
-        console.log("Error reading file, creating new one");
-    }
-    let inputs = JSON.parse(rawData);
+// Replace the existing merge logic with this:
 
-    const newInput = {
-      start_text: fullStartText,
-      prompt: mainPromptOptions
-    };
+let rawData = "{}";
+try {
+  rawData = fs.readFileSync(newInputsFile);
+} catch (error) {
+  console.log("Error reading file, creating new one");
+}
+let inputs = JSON.parse(rawData);
 
-    // Merge the new input with the existing data
-    const updatedInputs = Object.assign({}, inputs, newInput);
+const newInput = {
+  start_text: fullStartText,
+  prompt: mainPromptOptions
+};
 
-    // Write updated data back to file
-    fs.writeFileSync(newInputsFile, JSON.stringify(updatedInputs, null, 2));
+// Update logic to replace last entry
+let updatedInputs = { ...inputs };
+if (Object.keys(inputs).length === 0) {
+  updatedInputs = { 1: newInput };
+} else {
+  // Get the last key
+  const lastKey = Math.max(...Object.keys(inputs).map(Number));
+  // Replace the last entry
+  updatedInputs[lastKey] = newInput;
+}
+
+// Write updated data back to file
+fs.writeFileSync(newInputsFile, JSON.stringify(updatedInputs, null, 2));
 
     // Redirect back to form with success message
     res.render('index', {
