@@ -33,34 +33,99 @@ app.get('/', (req, res) => {
 
 app.post('/submit', (req, res) => {
   try {
-    const { start_text, prompts } = req.body;
+    const { name, prompt_selection, language } = req.body;
+
+    // Construct the start_text based on the name and language
+    const start_text = `Hiya, little buddy! I’m ${name}, the `;
+
+    // Determine the prompt based on the selection
+    let promptText = "";
+    let mainPromptOptions = [];
+    switch (prompt_selection) {
+      case "puzzle_solver":
+        promptText = "super-duper puzzle solver!";
+        mainPromptOptions = [
+          "Solve a tricky puzzle",
+          "Find a happy way to fix things",
+          "Help my friends"
+        ];
+        break;
+      case "story_teller":
+        promptText = "amazing story teller!";
+        mainPromptOptions = [
+          "Tell a story about animals",
+          "Tell a story about space",
+          "Tell a story about friendship"
+        ];
+        break;
+      case "joke_teller":
+        promptText = "hilarious joke teller!";
+        mainPromptOptions = [
+          "Tell a joke about cats",
+          "Tell a joke about dogs",
+          "Tell a joke about school"
+        ];
+        break;
+      default:
+        promptText = "unknown!";
+        mainPromptOptions = [];
+    }
+
+    const languageText = language === "hindi" ? " in Hindi." : ".";
+    let fullStartText = "";
     
-    // Read existing data
-    const rawData = fs.readFileSync(inputsFile);
-    const inputs = JSON.parse(rawData);
-    
-    // Add new input data with timestamp
+    switch (prompt_selection) {
+      case "puzzle_solver":
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to fix puzzle solver things${languageText}`;
+        break;
+      case "story_teller":
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell stories${languageText}`;
+        break;
+      case "joke_teller":
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell jokes${languageText}`;
+        break;
+      default:
+        fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to help${languageText}`;
+        break;
+    }
+
+    // Define the single new JSON file
+    const newInputsFile = path.join(dataDir, "new_inputs.json");
+
+    // Check if the file exists
+    if (!fs.existsSync(newInputsFile)) {
+      // If the file doesn't exist, create it with an empty object
+      fs.writeFileSync(newInputsFile, JSON.stringify({}, null, 2));
+    }
+
+    let rawData = "{}";
+    try {
+        rawData = fs.readFileSync(newInputsFile);
+    } catch (error) {
+        console.log("Error reading file, creating new one");
+    }
+    let inputs = JSON.parse(rawData);
+
     const newInput = {
-      id: Date.now(),
-      timestamp: new Date().toISOString(),
-      start_text,
-      prompts
+      start_text: fullStartText,
+      prompt: mainPromptOptions
     };
-    
-    inputs.push(newInput);
-    
+
+    // Merge the new input with the existing data
+    const updatedInputs = Object.assign({}, inputs, newInput);
+
     // Write updated data back to file
-    fs.writeFileSync(inputsFile, JSON.stringify(inputs, null, 2));
-    
+    fs.writeFileSync(newInputsFile, JSON.stringify(updatedInputs, null, 2));
+
     // Redirect back to form with success message
-    res.render('index', { 
+    res.render('index', {
       title: 'Input Form',
       success: true,
       message: 'Input saved successfully!'
     });
   } catch (error) {
     console.error('Error saving input:', error);
-    res.render('index', { 
+    res.render('index', {
       title: 'Input Form',
       success: false,
       message: 'Error saving input: ' + error.message

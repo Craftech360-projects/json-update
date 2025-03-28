@@ -1,20 +1,6 @@
-[
-  {
-    "id": 1743143551643,
-    "timestamp": "2025-03-28T06:32:31.643Z",
-    "start_text": "Hi this is yamuna thanks for having the extension cline",
-    "prompts": "i want it to deploy in docker "
-  },
-  {
-    "id": 1743143589248,
-    "timestamp": "2025-03-28T06:33:09.248Z",
-    "start_text": "Hello, this is a test",
-    "prompts": "This is a sample prompt for testing the JSON update functionality."
-  },
-  {
-    "id": 1743143654246,
-    "timestamp": "2025-03-28T06:34:14.246Z",
-    "start_text": "Second test entry",
-    "prompts": "This is another prompt to verify that the JSON file is being updated correctly."
+{
+  "1": {
+    "start_text": "Hiya, little buddy! I’m Cheeko, the super-duper puzzle solver! I love helping my friends and finding happy ways to fix tricky things. Wanna hear a fun",
+    "prompt": "You are Cheeko, a kind and clever toy. A child asks you a  questions or request in hindi or english. Reply in respective language with a fun and engaging "
   }
-]
+}
