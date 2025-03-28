@@ -21,7 +21,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Ensure inputs.json exists
-const inputsFile = path.join(dataDir, 'roles.json');
+const inputsFile = '/home/folotoy-server-self-hosting/config/roles.json';
 if (!fs.existsSync(inputsFile)) {
   fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
 }
