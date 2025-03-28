@@ -21,9 +21,9 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Ensure inputs.json exists
-const newInputsFile = path.join(dataDir, 'new_inputs.json');
-if (!fs.existsSync(newInputsFile)) {
-  fs.writeFileSync(newInputsFile, JSON.stringify({}, null, 2));
+const inputsFile = path.join(dataDir, 'roles.json');
+if (!fs.existsSync(inputsFile)) {
+  fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
 }
 
 // Routes
@@ -88,7 +88,7 @@ app.post('/submit', (req, res) => {
 
 let rawData = "{}";
 try {
-  rawData = fs.readFileSync(newInputsFile);
+  rawData = fs.readFileSync(inputsFile);
 } catch (error) {
   console.log("Error reading file, creating new one");
 }
@@ -111,7 +111,7 @@ if (Object.keys(inputs).length === 0) {
 }
 
 // Write updated data back to file
-fs.writeFileSync(newInputsFile, JSON.stringify(updatedInputs, null, 2));
+fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
 
     // Redirect back to form with success message
     res.render('index', {
