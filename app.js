@@ -21,6 +21,9 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Ensure inputs.json exists
+// "/home/folotoy-server-self-hosting/config/roles.json"
+// const inputsFile = path.join(dataDir, 'roles.json');
+
 const inputsFile = '/home/folotoy-server-self-hosting/config/roles.json';
 if (!fs.existsSync(inputsFile)) {
   fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
@@ -81,7 +84,7 @@ app.post('/submit', (req, res) => {
       ? `You are ${name}, a kind and clever toy. A child asks you a ${custom_prompt}. questions or request ${languageText} Reply in respective language with a fun and engaging.`
       : `You are ${name}, a kind and clever toy. A child asks you a ${promptText} questions or request${languageText} Reply in respective language with a fun and engaging.`;
     
-    const mainPromptOptions = [fullPrompt];
+    const mainPromptOptions = fullPrompt;
 
 
 // Replace the existing merge logic with this:
