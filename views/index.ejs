@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Input Form</h1>
+    
+    <% if (typeof success !== 'undefined') { %>
+      <div class="alert <%= success ? 'alert-success' : 'alert-error' %>">
+        <%= message %>
+      </div>
+    <% } %>
+    
+    <form action="/submit" method="POST">
+      <div class="form-group">
+        <label for="start_text">Start Text:</label>
+        <input type="text" id="start_text" name="start_text" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="prompts">Prompts:</label>
+        <textarea id="prompts" name="prompts" rows="4" required></textarea>
+      </div>
+      
+      <button type="submit" class="btn">Submit</button>
+    </form>
+    
+    <div class="info">
+      <p>Your inputs will be saved to a JSON file.</p>
+    </div>
+  </div>
+</body>
+</html>
