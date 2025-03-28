@@ -78,7 +78,7 @@ app.post('/submit', (req, res) => {
 
     const languageText = language ? ` in ${language}.` : ".";
     const fullPrompt = prompt_selection === 'custom' 
-      ? `You are ${name}, a ${custom_prompt}. You help children by ${custom_action}${languageText}`
+      ? `You are ${name}, a kind and clever toy. A child asks you a ${custom_prompt}. questions or request ${languageText} Reply in respective language with a fun and engaging.`
       : `You are ${name}, a kind and clever toy. A child asks you a ${promptText} questions or request${languageText} Reply in respective language with a fun and engaging.`;
     
     const mainPromptOptions = [fullPrompt];
