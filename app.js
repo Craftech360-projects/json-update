@@ -24,7 +24,7 @@ if (!fs.existsSync(dataDir)) {
 // "/home/folotoy-server-self-hosting/config/roles.json"
 // const inputsFile = path.join(dataDir, 'roles.json');
 
-const inputsFile = path.join(dataDir, 'roles.json');
+const inputsFile = '/home/folotoy-server-self-hosting/config/roles.json';
 if (!fs.existsSync(inputsFile)) {
   fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
 }
@@ -48,6 +48,8 @@ app.get('/', (req, res) => {
   });
 
 
+
+  
 app.post('/submit', (req, res) => {
   try {
     const { name, prompt_selection, language, custom_prompt, custom_action } = req.body;
@@ -86,7 +88,7 @@ app.post('/submit', (req, res) => {
         fullStartText = `Hiya, little buddy! I’m ${name}, the ${promptText}! I love helping my friends and finding happy ways to tell jokes.`;
         break;
         case "custom":
-          fullStartText = `Hiya, little buddy! I'm ${name}, the ${custom_prompt}! I love helping my friends and finding happy ways to ${custom_action}`;
+          fullStartText = `Hiya, little buddy! I’m ${name}, the ${custom_prompt}! I love helping my friends and finding happy ways to ${custom_action}.`;
           break;
         default:
           fullStartText = `Hiya, little buddy! I'm ${name}, the ${promptText}! I love helping my friends and finding happy ways to help.`;
@@ -95,9 +97,8 @@ app.post('/submit', (req, res) => {
 
     const languageText = language ? ` in ${language}.` : ".";
     const fullPrompt = prompt_selection === 'custom' 
-      ? `You are ${name}, a kind and clever toy. A child asks you a ${custom_prompt}. questions or request ${languageText} Reply in respective language with a fun and engaging.`
-      : `You are ${name}, a kind and clever toy. A child asks you a ${promptText} questions or request${languageText} Reply in respective language with a fun and engaging.`;
-    
+    ? `You are ${name}, a kind and clever toy. A child asks you about ${custom_prompt}. Respond to questions or requests${languageText} Reply in the respective language with a fun and engaging style.`
+    : `You are ${name}, a kind and clever toy. A child asks you ${promptText} questions${languageText} Reply in a fun and engaging style.`;
     const mainPromptOptions = fullPrompt;
 
 
@@ -140,6 +141,7 @@ fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
   }
   
 });
+
 
 app.post('/restart-docker', (req, res) => {
   console.log('Restarting Docker...');

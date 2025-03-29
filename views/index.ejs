@@ -5,108 +5,212 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .config-table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .config-table th, .config-table td {
+      padding: 12px 15px;
+      border: 1px solid #dddddd;
+      text-align: left;
+    }
+    .config-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+    .current-config {
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #3498db;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Input Form</h1>
-    
+    <h1>Toy Configuration Manager</h1>
+
+    <!-- Success/Error Messages -->
     <% if (typeof success !== 'undefined') { %>
-      <div class="alert <%= success ? 'alert-success' : 'alert-error' %>">
+      <div class="alert <%= success ? 'alert-success' : 'alert-error' %>" id="statusAlert">
         <%= message %>
       </div>
     <% } %>
-    
-    <form action="/submit" method="POST">
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-      </div>
 
-      <div class="form-group">
-        <label for="prompt_selection">Initial Prompt:</label>
-        <select id="prompt_selection" name="prompt_selection" required>
-          <option value="puzzle_solver">Super-duper puzzle solver</option>
-          <option value="story_teller">Amazing story teller</option>
-          <option value="joke_teller">Hilarious joke teller</option>
-          <option value="custom">Custom prompt</option>
-        </select>
-      </div>
+    <!-- Current Configuration Table -->
+    <div class="current-config">
+      <h2>Current Configuration</h2>
+      <%
+      let config = {
+        name: 'Not set',
+        role: 'Not configured',
+        language: 'English',
+        capabilities: 'Not specified'
+      };
 
-      <div class="form-group" id="custom-prompt-group" style="display: none;">
-        <label for="custom_prompt">Your Custom Role:</label>
-        <input type="text" id="custom_prompt" name="custom_prompt" placeholder="Enter the role (e.g. magical wizard)">
-        
-        <label for="custom_action">What can you help with?:</label>
-        <textarea id="custom_action" name="custom_action" rows="4" placeholder="Enter what you can help with"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Default Language: English</label>
-      </div>
+      const currentConfig = inputs && inputs['1'];
+      if (currentConfig) {
 
-   
-    
-      <div class="form-group">
-        <label for="language">Select Language:</label>
-        <select id="language" name="language">
-          <option value="English">English</option>
+        // Parse configuration from stored data
+        const nameMatch = currentConfig.start_text.match(/I’m (.*?), the/);
+        if (nameMatch) config.name = nameMatch[1] || 'Not set';
 
-
-          <option value="hindi">Hindi</option>
-          <option value="kannada">kannada</option>
-          <option value="tamil">Tamil</option>
-          <option value="malayalam">Malayalam</option>
-          <option value="bhojpuri">Bhojpuri</option>
-          <option value="punjabi">Punjabi</option>
-        </select>
-      </div>
-      
-      <button type="submit" class="btn">Submit</button>
-    </form>
-    
-    <div class="info">
-      <p>Your inputs will be saved to a JSON file.</p>
-    </div>
-    <button id="restartDocker" class="btn">Restart Docker</button>
-    <div id="loader" class="loader" style="display: none;"></div>
-  </div>
-  <style>
-.loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-  margin: 0 auto; /* Center the loader */
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
-  <script>
-    document.getElementById('prompt_selection').addEventListener('change', function() {
-        const customPromptGroup = document.getElementById('custom-prompt-group');
-        if (this.value === 'custom') {
-            customPromptGroup.style.display = 'block';
+        // Determine role type
+        if (currentConfig.start_text.includes('super-duper puzzle solver')) {
+          config.role = 'Puzzle Solver';
+        } else if (currentConfig.start_text.includes('amazing story teller')) {
+          config.role = 'Story Teller';
+        } else if (currentConfig.start_text.includes('hilarious joke teller')) {
+          config.role = 'Joke Teller';
         } else {
-            customPromptGroup.style.display = 'none';
+          const customMatch = currentConfig.start_text.match(/the (.*?)! I love/);
+          config.role = customMatch ? customMatch[1] : 'Custom Role';
         }
+
+        // Parse language
+        const langMatch = currentConfig.prompt.match(/ in (\w+)\./i);
+        if (langMatch) {
+          // Format language name properly
+          const lang = langMatch[1].toLowerCase();
+          config.language = lang.charAt(0).toUpperCase() + lang.slice(1);
+        } else {
+          config.language = 'English';
+        }
+      %>
+
+
+      <table class="config-table">
+        <tbody>
+          <tr>
+            <th>Toy Name</th>
+            <td><%= config.name %></td>
+          </tr>
+          <tr>
+            <th>Current Role</th>
+            <td><%= config.role %></td>
+          </tr>
+          <tr>
+            <th>Language</th>
+            <td><%= config.language %></td>
+          </tr>
+          <!-- <tr>
+            <th>Capabilities</th>
+            <td><%= config.capabilities %></td>
+          </tr> -->
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+
+    <!-- Update Configuration Form -->
+    <div class="update-form">
+      <h2>Update Configuration</h2>
+      <form action="/submit" method="POST">
+        <div class="form-group">
+          <label for="name">Toy Name:</label>
+          <input type="text" id="name" name="name" required 
+                 placeholder="Enter toy name">
+        </div>
+
+        <div class="form-group">
+          <label for="prompt_selection">Select Role Type:</label>
+          <select id="prompt_selection" name="prompt_selection" required>
+            <option value="puzzle_solver">Puzzle Solver</option>
+            <option value="story_teller">Story Teller</option>
+            <option value="joke_teller">Joke Teller</option>
+            <option value="custom">Custom Role</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="custom-prompt-group" style="display: none;">
+          <label for="custom_prompt">Custom Role Title:</label>
+          <input type="text" id="custom_prompt" name="custom_prompt" 
+                 placeholder="Enter custom role (e.g., Magical Wizard)">
+          
+          <label for="custom_action">Role Capabilities:</label>
+          <textarea id="custom_action" name="custom_action" rows="4"
+                    placeholder="Describe what this role can do"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="language">Select Language:</label>
+          <select id="language" name="language">
+            <option value="English">English</option>
+            <option value="hindi">Hindi</option>
+            <option value="kannada">Kannada</option>
+            <option value="tamil">Tamil</option>
+            <option value="malayalam">Malayalam</option>
+            <option value="bhojpuri">Bhojpuri</option>
+            <option value="punjabi">Punjabi</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn">Save Configuration</button>
+      </form>
+    </div>
+
+    <!-- System Controls -->
+    <div class="system-controls">
+      <p class="info-note">Configuration changes require Docker restart to take effect</p>
+
+      <button id="restartDocker" class="btn">Restart Docker Service</button>
+
+      <div id="loader" class="loader" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle custom role fields
+    document.getElementById('prompt_selection').addEventListener('change', function() {
+      const customGroup = document.getElementById('custom-prompt-group');
+      customGroup.style.display = this.value === 'custom' ? 'block' : 'none';
     });
+
+    // Docker restart handler
     document.getElementById('restartDocker').addEventListener('click', async function() {
-    const loader = document.getElementById('loader');
-    loader.style.display = 'block'; // Show loader
-    try {
-      const response = await fetch('/restart-docker', { method: 'POST' });
-      const result = await response.json();
-      loader.style.display = 'none'; // Hide loader after response
-      alert(result.message);
-    } catch (error) {
-      loader.style.display = 'none'; // Hide loader on error as well
-      alert('Failed to restart Docker');
-    }
-  });
-    </script>
+      const loader = document.getElementById('loader');
+      try {
+        loader.style.display = 'block';
+        const response = await fetch('/restart-docker', { method: 'POST' });
+        const result = await response.json();
+        alert(result.message);
+      } catch (error) {
+        alert('Failed to restart Docker: ' + error.message);
+      } finally {
+        loader.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const alertElement = document.getElementById('statusAlert');
+        if (alertElement) {
+          // Start fade out after 5 seconds
+          setTimeout(() => {
+            alertElement.classList.add('fade-out');
+            // Remove element after animation
+            setTimeout(() => {
+              alertElement.remove();
+            }, 500); // Match transition duration
+          }, 5000); // 5 seconds
+        }
+      });
+  </script>
 </body>
 </html>
