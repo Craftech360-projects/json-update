@@ -135,7 +135,7 @@ fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
 
 app.post('/restart-docker', (req, res) => {
   console.log('Restarting Docker...');
-  exec('cd /home/folotoy-server-self-hosting && docker compose down && docker compose up -d', (error, stdout, stderr) => {
+  exec('cd /home/folotoy-server-self-hosting && docker-compose down && docker-compose up -d', (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       res.json({ success: false, message: `Failed to restart Docker: ${error.message}` });
