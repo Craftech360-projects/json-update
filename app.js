@@ -24,15 +24,29 @@ if (!fs.existsSync(dataDir)) {
 // "/home/folotoy-server-self-hosting/config/roles.json"
 // const inputsFile = path.join(dataDir, 'roles.json');
 
-const inputsFile = '/home/folotoy-server-self-hosting/config/roles.json';
+const inputsFile = path.join(dataDir, 'roles.json');
 if (!fs.existsSync(inputsFile)) {
   fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
 }
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('index', { title: 'Input Form' });
-});
+  let inputs = {};
+  try {
+    const rawData = fs.readFileSync(inputsFile);
+    inputs = JSON.parse(rawData);
+  } catch (error) {
+    console.error("Error reading inputs file:", error);
+    inputs = {};
+  }
+  +  res.render('index', { 
+      title: 'Input Form',
+       inputs: inputs,
+       success: req.query.success,
+       message: req.query.message 
+     });
+  });
+
 
 app.post('/submit', (req, res) => {
   try {
@@ -117,20 +131,14 @@ if (Object.keys(inputs).length === 0) {
 // Write updated data back to file
 fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
 
-    // Redirect back to form with success message
-    res.render('index', {
-      title: 'Input Form',
-      success: true,
-      message: 'Input saved successfully!'
-    });
+  
+    res.redirect('/?success=true&message=Input+saved+successfully');
   } catch (error) {
     console.error('Error saving input:', error);
-    res.render('index', {
-      title: 'Input Form',
-      success: false,
-      message: 'Error saving input: ' + error.message
-    });
+
+    res.redirect(`/?success=false&message=${encodeURIComponent('Error saving input: ' + error.message)}`);
   }
+  
 });
 
 app.post('/restart-docker', (req, res) => {
