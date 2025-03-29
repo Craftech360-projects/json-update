@@ -66,6 +66,7 @@
     <div class="info">
       <p>Your inputs will be saved to a JSON file.</p>
     </div>
+    <button id="restartDocker" class="btn">Restart Docker</button>
   </div>
   <script>
     document.getElementById('prompt_selection').addEventListener('change', function() {
@@ -76,6 +77,15 @@
             customPromptGroup.style.display = 'none';
         }
     });
+    document.getElementById('restartDocker').addEventListener('click', async function() {
+    try {
+      const response = await fetch('/restart-docker', { method: 'POST' });
+      const result = await response.json();
+      alert(result.message);
+    } catch (error) {
+      alert('Failed to restart Docker');
+    }
+  });
     </script>
 </body>
 </html>

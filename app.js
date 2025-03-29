@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+const { exec } = require('child_process');
 // Set up EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -112,6 +112,22 @@ if (Object.keys(inputs).length === 0) {
   // Replace the last entry
   updatedInputs[lastKey] = newInput;
 }
+
+app.post('/restart-docker', (req, res) => {
+  const dockerCommand = 'cd /home/folotoy-server-self-hosting && docker compose down && docker compose up -d';
+
+  exec(dockerCommand, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error restarting Docker: ${error.message}`);
+      return res.json({ success: false, message: 'Failed to restart Docker' });
+    }
+    if (stderr) {
+      console.error(`Docker stderr: ${stderr}`);
+    }
+    console.log(`Docker stdout: ${stdout}`);
+    res.json({ success: true, message: 'Docker restarted successfully' });
+  });
+});
 
 // Write updated data back to file
 fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
