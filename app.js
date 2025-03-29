@@ -134,20 +134,16 @@ fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
 });
 
 app.post('/restart-docker', (req, res) => {
-  console.log("Received request to restart Docker");
-
-  const dockerCommand = 'cd /home/folotoy-server-self-hosting && docker compose down && docker compose up -d';
-
-  exec(dockerCommand, (error, stdout, stderr) => {
+  console.log('Restarting Docker...');
+  exec('cd /home/folotoy-server-self-hosting && docker compose down && docker compose up -d', (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error restarting Docker: ${error.message}`);
-      return res.status(500).json({ success: false, message: 'Failed to restart Docker' });
+      console.error(`exec error: ${error}`);
+      res.json({ success: false, message: `Failed to restart Docker: ${error.message}` });
+      return;
     }
-    if (stderr) {
-      console.error(`Docker stderr: ${stderr}`);
-    }
-    console.log(`Docker stdout: ${stdout}`);
-    res.json({ success: true, message: 'Docker restarted successfully' });
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.json({ success: true, message: 'Docker restart command executed successfully!' });
   });
 });
 
