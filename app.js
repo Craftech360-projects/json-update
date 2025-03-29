@@ -114,12 +114,14 @@ if (Object.keys(inputs).length === 0) {
 }
 
 app.post('/restart-docker', (req, res) => {
+  console.log("Received request to restart Docker");
+
   const dockerCommand = 'cd /home/folotoy-server-self-hosting && docker compose down && docker compose up -d';
 
   exec(dockerCommand, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error restarting Docker: ${error.message}`);
-      return res.json({ success: false, message: 'Failed to restart Docker' });
+      return res.status(500).json({ success: false, message: 'Failed to restart Docker' });
     }
     if (stderr) {
       console.error(`Docker stderr: ${stderr}`);
@@ -128,6 +130,7 @@ app.post('/restart-docker', (req, res) => {
     res.json({ success: true, message: 'Docker restarted successfully' });
   });
 });
+
 
 // Write updated data back to file
 fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
