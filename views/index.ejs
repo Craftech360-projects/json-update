@@ -477,6 +477,8 @@
         </div>
       </form>
     </div>
+<!-- Loader -->
+<div id="loader" class="loader" style="display: none;"></div>
 
 
   </div>
@@ -499,6 +501,13 @@
     document.getElementById('cancel-edit-btn').addEventListener('click', function() {
       document.getElementById('update-config-card').classList.add('hidden');
     });
+
+    const loader = document.getElementById('loader');
+const loadingMsg = document.getElementById('loading-msg');
+
+loader.style.display = 'block';
+if (loadingMsg) loadingMsg.style.display = 'block';
+
 
     // Form submission handler
     document.getElementById('config-form').addEventListener('submit', async function(event) {
