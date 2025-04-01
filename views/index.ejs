@@ -234,7 +234,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Toy Configuration Manager</h1>
+    <h1>Cheeki Toy Manager</h1>
 
     <!-- Success/Error Messages -->
     <% if (typeof success !== 'undefined') { %>
@@ -246,7 +246,7 @@
     <div class="page-layout">
       <!-- Current Configuration Section -->
       <div class="card">
-        <h2>Current Configuration</h2>
+        <h2>Active Settings</h2>
         <%
         let config = {
           name: 'Not set',
@@ -320,7 +320,7 @@
 
       <!-- Update Configuration Form -->
       <div class="card">
-        <h2>Update Configuration</h2>
+        <h2>Change Settings</h2>
         <form action="/submit" method="POST">
           <div class="form-group">
             <label for="name">Toy Name:</label>
@@ -371,7 +371,7 @@
             </select>
           </div>
 
-          <button type="submit" class="btn">Save Configuration</button>
+          <button type="submit" class="btn">Save</button>
         </form>
       </div>
     </div>
