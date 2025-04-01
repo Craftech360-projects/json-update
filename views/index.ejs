@@ -485,82 +485,75 @@
 
   <script>
     // Toggle custom role fields
-    document.getElementById('prompt_selection').addEventListener('change', function() {
+    document.getElementById('prompt_selection').addEventListener('change', function () {
       const customGroup = document.getElementById('custom-prompt-group');
       customGroup.style.display = this.value === 'custom' ? 'block' : 'none';
     });
-
+  
     // Edit settings button handler
-    document.getElementById('edit-settings-btn').addEventListener('click', function() {
+    document.getElementById('edit-settings-btn').addEventListener('click', function () {
       const configCard = document.getElementById('update-config-card');
       configCard.classList.remove('hidden');
       configCard.classList.add('slide-in');
     });
-
+  
     // Cancel edit button handler
-    document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+    document.getElementById('cancel-edit-btn').addEventListener('click', function () {
       document.getElementById('update-config-card').classList.add('hidden');
     });
-
-    const loader = document.getElementById('loader');
-const loadingMsg = document.getElementById('loading-msg');
-
-loader.style.display = 'block';
-if (loadingMsg) loadingMsg.style.display = 'block';
-
-
+  
     // Form submission handler
-    document.getElementById('config-form').addEventListener('submit', async function(event) {
+    document.getElementById('config-form').addEventListener('submit', async function (event) {
       event.preventDefault(); // Prevent default form submission
+  
       const loader = document.getElementById('loader');
+  
       try {
+        // Show loader only after Save button is clicked
         loader.style.display = 'block';
-
+  
         // Submit form data
         const formData = new FormData(this);
         const response = await fetch('/submit', {
           method: 'POST',
           body: formData
         });
-
+  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+  
         const result = await response.json();
-        if(result.success) {
+        if (result.success) {
           // Restart Docker after successful config update
           const restartResponse = await fetch('/restart-docker', { method: 'POST' });
           const restartResult = await restartResponse.json();
-          alert(restartResult.message); // Or handle success message better
+          alert(restartResult.message); // Show Docker restart message
         } else {
-          alert(result.message); // Show error message from config update
+          alert(result.message); // Show config error message
         }
-
-
       } catch (error) {
         alert('Failed to update configuration or restart Docker: ' + error.message);
       } finally {
         loader.style.display = 'none';
-        // After all operations, page reload might be needed to reflect changes properly
+        // Reload to reflect updated config
         window.location.reload();
       }
     });
-
-
+  
+    // Auto fade alert
     document.addEventListener('DOMContentLoaded', () => {
       const alertElement = document.getElementById('statusAlert');
       if (alertElement) {
-        // Start fade out after 5 seconds
         setTimeout(() => {
           alertElement.classList.add('fade-out');
-          // Remove element after animation
           setTimeout(() => {
             alertElement.remove();
-          }, 500); // Match transition duration
-        }, 5000); // 5 seconds
+          }, 500); // match CSS transition duration
+        }, 5000);
       }
     });
   </script>
+  
 </body>
 </html>
