@@ -252,38 +252,42 @@
           name: 'Not set',
           role: 'Not configured',
           language: 'English',
-          capabilities: 'Not specified'
-        };
+        capabilities: 'Not specified',
+        voice: 'Not set' // Default voice
+      };
 
-        const currentConfig = inputs && inputs['1'];
-        if (currentConfig) {
+      const currentConfig = inputs && inputs['1'];
+      if (currentConfig) {
 
-          // Parse configuration from stored data
-          const nameMatch = currentConfig.start_text.match(/I'm (.*?), the/);
-          if (nameMatch) config.name = nameMatch[1] || 'Not set';
+        // Parse configuration from stored data
+        const nameMatch = currentConfig.start_text.match(/I’m (.*?), the/);
+        if (nameMatch) config.name = nameMatch[1] || 'Not set';
 
-          // Determine role type
-          if (currentConfig.start_text.includes('super-duper puzzle solver')) {
-            config.role = 'Puzzle Solver';
-          } else if (currentConfig.start_text.includes('amazing story teller')) {
-            config.role = 'Story Teller';
-          } else if (currentConfig.start_text.includes('hilarious joke teller')) {
-            config.role = 'Joke Teller';
-          } else {
-            const customMatch = currentConfig.start_text.match(/the (.*?)! I love/);
-            config.role = customMatch ? customMatch[1] : 'Custom Role';
-          }
+        // Determine role type
+        if (currentConfig.start_text.includes('super-duper puzzle solver')) {
+          config.role = 'Puzzle Solver';
+        } else if (currentConfig.start_text.includes('amazing story teller')) {
+          config.role = 'Story Teller';
+        } else if (currentConfig.start_text.includes('hilarious joke teller')) {
+          config.role = 'Joke Teller';
+        } else {
+          const customMatch = currentConfig.start_text.match(/the (.*?)! I love/);
+          config.role = customMatch ? customMatch[1] : 'Custom Role';
+        }
 
-          // Parse language
-          const langMatch = currentConfig.prompt.match(/ in (\w+)\./i);
-          if (langMatch) {
-            // Format language name properly
-            const lang = langMatch[1].toLowerCase();
-            config.language = lang.charAt(0).toUpperCase() + lang.slice(1);
-          } else {
-            config.language = 'English';
-          }
-        %>
+        // Parse language
+        const langMatch = currentConfig.prompt.match(/ in (\w+)\./i);
+        if (langMatch) {
+          // Format language name properly
+          const lang = langMatch[1].toLowerCase();
+          config.language = lang.charAt(0).toUpperCase() + lang.slice(1);
+        } else {
+          config.language = 'English';
+        }
+
+        // Set voice - assuming you save voice ID in inputs
+        config.voice = currentConfig.voice || 'Default'; // Or 'Not set'
+      %>
 
         <table class="config-table">
           <tbody>
@@ -299,6 +303,10 @@
               <th>Language</th>
               <td><%= config.language %></td>
             </tr>
+            <!-- <tr>
+              <th>Selected Voice</th>
+              <td><%= config.voice %></td>
+            </tr> -->
             <!-- <tr>
               <th>Capabilities</th>
               <td><%= config.capabilities %></td>
