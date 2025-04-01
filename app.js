@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
   
 app.post('/submit', (req, res) => {
   try {
-    const { name, prompt_selection, language, custom_prompt, custom_action } = req.body;
+    const { name, prompt_selection, language, custom_prompt, custom_action, voice } = req.body;
 
     // Construct the start_text based on the name
     const start_text = `Hiya, little buddy! I’m ${name}, the `;
@@ -132,7 +132,17 @@ if (Object.keys(inputs).length === 0) {
 // Write updated data back to file
 fs.writeFileSync(inputsFile, JSON.stringify(updatedInputs, null, 2));
 
-  
+    // Update docker-compose.yml file
+    const dockerComposeFile = '/home/folotoy-server-self-hosting/docker-compose.yml';
+    let dockerComposeContent = fs.readFileSync(dockerComposeFile, 'utf8');
+
+    const voiceIdRegex = /ELEVENLABS_TTS_VOICE_ID: .*/;
+    const newVoiceIdLine = `ELEVENLABS_TTS_VOICE_ID: ${voice}`;
+    dockerComposeContent = dockerComposeContent.replace(voiceIdRegex, newVoiceIdLine);
+
+    fs.writeFileSync(dockerComposeFile, dockerComposeContent);
+
+
     res.redirect('/?success=true&message=Input+saved+successfully');
   } catch (error) {
     console.error('Error saving input:', error);
