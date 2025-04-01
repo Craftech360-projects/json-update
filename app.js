@@ -24,7 +24,7 @@ if (!fs.existsSync(dataDir)) {
 // "/home/folotoy-server-self-hosting/config/roles.json"
 // const inputsFile = path.join(dataDir, 'roles.json');
 
-const inputsFile = "/home/folotoy-server-self-hosting/config/roles.json";
+const inputsFile = path.join(dataDir, 'roles.json');
 if (!fs.existsSync(inputsFile)) {
   fs.writeFileSync(inputsFile, JSON.stringify({}, null, 2));
 }
